@@ -55,9 +55,9 @@ The skills CLI installs the selected canonical folders into the paths used by yo
 Copy-based installs and already-running agent tasks do not refresh themselves. After `0.2.4` is released, update the installed skills in the same scope you originally chose:
 
 ```bash
-npx skills update --project --yes
+npx skills update find-in-stratagraph post post-nodes import gather --project --yes
 # or, for a global install
-npx skills update --global --yes
+npx skills update find-in-stratagraph post post-nodes import gather --global --yes
 ```
 
 Then start a fresh task or reload the agent so it does not retain cached pre-`0.2.4` instructions.

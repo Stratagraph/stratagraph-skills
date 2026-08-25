@@ -83,6 +83,26 @@ class FindInStratagraphTests(unittest.TestCase):
         )
         self.assertIn("state any remaining uncertainty", self.lower)
 
+    def test_imported_nodes_use_the_current_admission_contract(self):
+        current_contract = (
+            "`admission_method` is `import` and `review` is `unreviewed`"
+        )
+        legacy_fallback = (
+            "only when `admission_method` is absent, treat the legacy `review` value "
+            "`imported`"
+        )
+
+        self.assertIn(current_contract, self.lower)
+        self.assertIn(legacy_fallback, self.lower)
+        self.assertLess(
+            self.lower.index(current_contract),
+            self.lower.index(legacy_fallback),
+        )
+        self.assertNotIn(
+            "if a claim's `review` value is `imported`",
+            self.lower,
+        )
+
     def test_lineage_does_not_change_node_status(self):
         self.assertIn(
             "they do not hide, invalidate, or supersede any node",

@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 MARKETPLACE_PATH = ROOT / ".claude-plugin" / "marketplace.json"
 CODEX_MANIFEST_PATH = ROOT / ".codex-plugin" / "plugin.json"
+README_PATH = ROOT / "README.md"
 
 
 def canonical_skills():
@@ -100,6 +101,21 @@ class PackagingTests(unittest.TestCase):
         adapter = ROOT / ".claude" / "skills" / "gather"
         self.assertTrue(adapter.is_symlink())
         self.assertEqual(adapter.resolve(), (SKILLS_DIR / "gather").resolve())
+
+    def test_readme_updates_only_named_stratagraph_skills(self):
+        readme = README_PATH.read_text(encoding="utf-8")
+        named_skills = "find-in-stratagraph post post-nodes import gather"
+
+        self.assertIn(
+            f"npx skills update {named_skills} --project --yes",
+            readme,
+        )
+        self.assertIn(
+            f"npx skills update {named_skills} --global --yes",
+            readme,
+        )
+        self.assertNotIn("npx skills update --project", readme)
+        self.assertNotIn("npx skills update --global", readme)
 
 
 if __name__ == "__main__":

@@ -36,6 +36,9 @@ class NoEdgeSurfacesTests(unittest.TestCase):
             "has_source_stale",
             "replace_reason",
             "edges_dropped",
+            "countered, replaced, or resolved",
+            "stratagraph can connect repeated support after import",
+            "stratagraph connects it to relevant imported history",
         )
         forbidden_words = re.compile(
             r"\b(?:edge|edges|relationship|relationships)\b", re.IGNORECASE
@@ -65,6 +68,33 @@ class NoEdgeSurfacesTests(unittest.TestCase):
         self.assertEqual(
             {"find-in-stratagraph", "post", "post-nodes", "import", "gather"},
             scanned,
+        )
+
+    def test_required_import_references_are_scanned(self):
+        scanned = set(shipped_text_files())
+        required = {
+            ROOT / "skills" / "import" / "references" / "evidence.md",
+            ROOT / "skills" / "import" / "references" / "technical.md",
+        }
+        self.assertTrue(required <= scanned, required - scanned)
+
+    def test_import_guidance_is_nodes_only(self):
+        evidence = (
+            ROOT / "skills" / "import" / "references" / "evidence.md"
+        ).read_text(encoding="utf-8")
+        skill = (ROOT / "skills" / "import" / "SKILL.md").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("Semantic indexing works at node level", evidence)
+        self.assertIn("could change independently", evidence)
+        self.assertIn(
+            "keep each source-backed occurrence in a separate node",
+            evidence,
+        )
+        self.assertIn(
+            "its extracted nodes are indexed semantically alongside the imported nodes",
+            skill,
         )
 
     def test_post_nodes_matches_the_nodes_only_receipt(self):

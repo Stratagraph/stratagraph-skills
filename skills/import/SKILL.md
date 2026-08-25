@@ -219,7 +219,7 @@ Write focused prose that covers what is in force, what changed, and what remains
 
 Show each draft to the user and ask for corrections. After approval, post it with `strata_post_document`. Use `_import/baseline-<slug>.md` as its `externalId`.
 
-The document must pass the normal Stratagraph review gate. After approval there, Stratagraph connects it to relevant imported history.
+The document must pass the normal Stratagraph review gate. After approval there, its extracted nodes are indexed semantically alongside the imported nodes.
 
 If search or retrieval tools are unavailable, stop and offer setup help. Do not describe an ungrounded draft as evidence-backed. If the user chooses a manual path, use only facts they explicitly provide and ask them to verify every claim before upload.
 

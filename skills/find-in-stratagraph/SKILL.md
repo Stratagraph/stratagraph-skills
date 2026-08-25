@@ -100,7 +100,8 @@ A node's existence in the project does not establish that it is relevant, true, 
 - Keep the source or event date from `occurred_at` when present. `document_date` is source context, not a promise of precise event time; `record_created` is the fallback for a documentless node. Do not silently replace either with another timestamp.
 - Attribute a statement to a person only when the node or source names that speaker or author.
 - Never treat the newest returned claim or the end of a lineage path as current merely because it is newest or last.
-- If a claim's `review` value is `imported`, say so when review status affects trust. Do not describe it as confirmed current state.
+- When `admission_method` is `import` and `review` is `unreviewed`, say that the claim was imported and has not been human-reviewed when that status affects trust. Do not describe it as confirmed current state.
+- Only when `admission_method` is absent, treat the legacy `review` value `imported` as an imported, unreviewed claim and apply the same caution.
 - Remember that semantic search returns only the highest-ranked candidates. It does not inspect every node, so a missing result does not prove that the project lacks the information.
 
 A recently posted node may still be waiting for search indexing. Say so when that could explain an empty result. If the document is known, use `strata_get_document`. Otherwise, run at most 1 more search with a different document, speaker, date, or specific term. Then name what you searched and the remaining limitation.

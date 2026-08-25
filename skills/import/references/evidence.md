@@ -49,7 +49,7 @@ The user may confirm that a document was written by a person. Record that confir
 
 ## Keep each claim verifiable
 
-- Put one independently maintainable claim in each node: split wherever one part could be countered, replaced, or resolved without the other part changing.
+- Semantic indexing works at node level. Put one independently verifiable claim in each node, and split any statement whose parts need separate evidence or could change independently.
 - Usually one sentence, in plain prose without em dashes or semicolons. Atomic does not mean telegraphic: keep the subject, scope, and timeframe the claim needs to stand alone.
 - Copy 1 to 5 supporting spans exactly from the source.
 - Include a speaker only when the source identifies them.
@@ -57,6 +57,6 @@ The user may confirm that a document was written by a person. Record that confir
 - Use implementation records for behavior, not unstated intent.
 - Resolve the source date. Do not guess.
 
-Stratagraph can connect repeated support after import. Do not merge it during extraction.
+When separate sources repeat a claim, keep each source-backed occurrence in a separate node. Each node enters semantic indexing independently after import.
 
 A generated current-state document is allowed only because the user reviews it and every factual claim points to retrieved evidence.
