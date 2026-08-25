@@ -12,52 +12,85 @@ class FindInStratagraphTests(unittest.TestCase):
         cls.skill = SKILL_PATH.read_text(encoding="utf-8")
         cls.lower = cls.skill.lower()
 
-    def test_search_results_are_candidates_not_authority(self):
-        self.assertIn("semantic_similarity", self.skill)
+    def test_semantic_search_is_the_discovery_layer(self):
+        self.assertIn("search is always the discovery layer", self.lower)
+        self.assertIn("chronology still starts with search", self.lower)
         self.assertIn(
             "treat `semantic_similarity` when supplied as relative proximity, not truth, confidence, relevance, or currentness.",
             self.lower,
         )
         self.assertIn(
-            "a node's existence in the graph does not establish that it is relevant, true, or current.",
-            self.lower,
-        )
-        self.assertIn(
-            "describe conclusions as graph grounding — what the project records and currently treats as canonical — rather than externally verified truth unless separate evidence verifies them.",
+            "never answer a substantive question from search snippets alone",
             self.lower,
         )
 
-    def test_current_state_checks_each_dimension(self):
-        for field in ("occurred_at", "occurred_at_basis", "review"):
+    def test_lineage_requires_a_useful_search_hit_and_available_fence(self):
+        for contract in (
+            "`strata_explore_lineage` is attached",
+            "`lineage.state: available`",
+            "`lineage.as_of_fence`",
+            "`older_available`",
+            "`newer_available`",
+            "adjacent chronology would help",
+        ):
+            with self.subTest(contract=contract):
+                self.assertIn(contract, self.lower)
+
+        self.assertIn(
+            "the exact returned node key, the advertised direction, and the response-level fence",
+            self.lower,
+        )
+
+    def test_lineage_paging_and_farther_steps_keep_the_snapshot(self):
+        self.assertIn(
+            "keep the same anchor node, direction, and fence, and add the returned cursor",
+            self.lower,
+        )
+        self.assertIn(
+            "use a relevant returned node that advertises the requested direction, omit the prior cursor, and retain the original fence",
+            self.lower,
+        )
+        self.assertIn("do not expand chronology automatically", self.lower)
+
+    def test_unavailable_or_expired_lineage_falls_back_to_search(self):
+        for condition in (
+            "lineage tool is absent",
+            "lineage is unavailable",
+            "the fence is null",
+            "no useful direction is advertised",
+            "exploration returns `expired`",
+        ):
+            with self.subTest(condition=condition):
+                self.assertIn(condition, self.lower)
+        self.assertIn("never reuse an expired fence", self.lower)
+
+    def test_current_state_is_evidence_based_and_uncertain(self):
+        for field in (
+            "`occurred_at`",
+            "`occurred_at_basis`",
+            "`review`",
+            "`admission_method`",
+        ):
             with self.subTest(field=field):
-                self.assertIn(f"`{field}`", self.skill)
+                self.assertIn(field, self.skill)
         self.assertIn(
-            "incoming `replaces` and `resolves` relationships, and `counters` relationships in both directions.",
+            "mcp chronology cannot certify an authoritative current head",
             self.lower,
         )
         self.assertIn(
-            "an inbound `replaces` edge retires a claim; counters and age alone do not.",
+            "never treat the newest returned claim or the end of a lineage path as current",
             self.lower,
         )
+        self.assertIn("state any remaining uncertainty", self.lower)
 
-    def test_replacement_chain_is_bounded_and_cycle_safe(self):
+    def test_lineage_does_not_change_node_status(self):
         self.assertIn(
-            "start with `superseded_by` when search supplies it, then use `strata_list_edges` for each next inbound `replaces` hop.",
+            "they do not hide, invalidate, or supersede any node",
             self.lower,
         )
-        self.assertIn("track every visited node key.", self.lower)
-        self.assertIn(
-            "stop if a key repeats; report a replacement cycle and that no live head was found.",
-            self.lower,
-        )
-        self.assertIn(
-            "stop after 20 hops; report the unresolved cap rather than guessing.",
-            self.lower,
-        )
-        self.assertIn(
-            "if the walk ends at a node with no inbound `replaces`, cite that terminal successor",
-            self.lower,
-        )
+        for limit in ("truth", "currentness", "completeness", "relevance"):
+            with self.subTest(limit=limit):
+                self.assertIn(limit, self.lower)
 
 
 if __name__ == "__main__":
