@@ -29,27 +29,36 @@ class FindInStratagraphTests(unittest.TestCase):
             "`strata_explore_lineage` is attached",
             "`lineage.state: available`",
             "`lineage.as_of_fence`",
-            "`older_available`",
-            "`newer_available`",
-            "adjacent chronology would help",
+            "`lineage_context.path_count` is greater than zero",
+            "full chronological paths would help",
         ):
             with self.subTest(contract=contract):
                 self.assertIn(contract, self.lower)
 
         self.assertIn(
-            "the exact returned node key, the advertised direction, and the response-level fence",
+            "the exact returned node key and the response-level fence",
             self.lower,
         )
 
-    def test_lineage_paging_and_farther_steps_keep_the_snapshot(self):
+    def test_full_path_semantics_and_paging_keep_the_snapshot(self):
         self.assertIn(
-            "keep the same anchor node, direction, and fence, and add the returned cursor",
+            "each `path` reference is local to this response",
             self.lower,
         )
         self.assertIn(
-            "use a relevant returned node that advertises the requested direction, omit the prior cursor, and retain the original fence",
+            "`origin_context` records creation provenance and does not establish membership",
             self.lower,
         )
+        self.assertIn("grouped oldest-to-newest by source event", self.lower)
+        self.assertIn("claims within one event are peers", self.lower)
+        self.assertIn("`span.complete: false`", self.lower)
+        self.assertIn(
+            "keep the same origin node and fence and add the returned cursor",
+            self.lower,
+        )
+        self.assertIn("`paths_truncated`", self.lower)
+        self.assertIn("`path_count_basis` is `lower_bound`", self.lower)
+        self.assertIn("`continuation.members_truncated`", self.lower)
         self.assertIn("do not expand chronology automatically", self.lower)
 
     def test_unavailable_or_expired_lineage_falls_back_to_search(self):
@@ -57,7 +66,7 @@ class FindInStratagraphTests(unittest.TestCase):
             "lineage tool is absent",
             "lineage is unavailable",
             "the fence is null",
-            "no useful direction is advertised",
+            "the useful result has no paths",
             "exploration returns `expired`",
         ):
             with self.subTest(condition=condition):

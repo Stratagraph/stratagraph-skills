@@ -8,7 +8,7 @@ Nothing here is tied to a specific project, team, or connector, so any team can 
 
 ### `find-in-stratagraph`
 
-Answers focused questions from a connected Stratagraph project. Semantic search identifies candidates, and the skill reads the full nodes or documents used as evidence. When chronology would help, a search result may advertise optional older or newer lineage context for the agent to explore. Lineage is provisional wayfinding, never truth, currentness, or completeness. Briefs are optional. The skill never writes to the project, and each material claim cites an exact node key linked to its Stratagraph page. Invoke it with `/stratagraph:find-in-stratagraph`, or ask a focused factual, requirement, status, ownership, source, or chronology question whose answer should come from Stratagraph.
+Answers focused questions from a connected Stratagraph project. Semantic search identifies candidates, and the skill reads the full nodes or documents used as evidence. When chronology would help, a search result may advertise optional full lineage paths for the agent to explore, grouped chronologically by source event. Lineage is provisional wayfinding, never truth, currentness, or completeness. Briefs are optional. The skill never writes to the project, and each material claim cites an exact node key linked to its Stratagraph page. Invoke it with `/stratagraph:find-in-stratagraph`, or ask a focused factual, requirement, status, ownership, source, or chronology question whose answer should come from Stratagraph.
 
 ### `post`
 

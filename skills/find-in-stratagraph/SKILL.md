@@ -78,18 +78,19 @@ Search is always the discovery layer. Lineage is an optional follow-on when all 
 
 - `strata_explore_lineage` is attached;
 - the search response reports `lineage.state: available` and a non-null opaque `lineage.as_of_fence`;
-- a useful result's `lineage_context` advertises `older_available` or `newer_available`; and
-- adjacent chronology would help answer the user's question.
+- a useful result's `lineage_context.path_count` is greater than zero; and
+- full chronological paths would help answer the user's question.
 
-Call `strata_explore_lineage` with the exact returned node key, the advertised direction, and the response-level fence. Treat its returned claims as full evidence with provisional chronological context, then judge their relevance to the question.
+Call `strata_explore_lineage` with the exact returned node key and the response-level fence. Treat its returned membership claims as full evidence with provisional chronological context, then judge their relevance to the question.
 
-- To page through the same adjacent event, keep the same anchor node, direction, and fence, and add the returned cursor.
-- To step one event farther, use a relevant returned node that advertises the requested direction, omit the prior cursor, and retain the original fence.
-- Stop when the evidence answers the question, the direction is no longer advertised, or the returned context is not relevant. Do not expand chronology automatically.
+- Read `paths` as bounded summaries of the relevant chronological paths. Each `path` reference is local to this response, `name` was assigned when the path was created, and `origin_context` records creation provenance and does not establish membership. A `span.complete: false` value means its counts cover only the readable prefix.
+- Read membership claims from `page`, grouped oldest-to-newest by source event. Claims within one event are peers; their array order carries no chronology. `continues_before` or `continues_after` means that event crosses a page boundary.
+- To page through the same full-path exploration, keep the same origin node and fence and add the returned cursor. Follow pages only until the evidence answers the question or is no longer relevant. Do not expand chronology automatically.
+- State the limitation when `path_count_basis` is `lower_bound`, `paths_truncated` is true, a span is incomplete, or `continuation.members_truncated` is true.
 
-Fall back immediately to semantic search and document retrieval when the lineage tool is absent, lineage is unavailable, the fence is null, no useful direction is advertised, or exploration returns `expired`. On expiry, run `strata_search_nodes` again only if chronology is still needed; use the new response and fence. Never reuse an expired fence.
+Fall back immediately to semantic search and document retrieval when the lineage tool is absent, lineage is unavailable, the fence is null, the useful result has no paths, or exploration returns `expired`. On expiry, run `strata_search_nodes` again only if chronology is still needed; use the new response and fence. Never reuse an expired fence.
 
-Lineage membership, direction, and absence are provisional. They do not establish truth, currentness, completeness, contradiction, or relevance, and they do not hide, invalidate, or supersede any node.
+Lineage membership, path names, origin context, and absence are provisional. They do not establish truth, currentness, completeness, contradiction, or relevance, and they do not hide, invalidate, or supersede any node.
 
 ## Check the answer
 
