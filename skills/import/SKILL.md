@@ -209,7 +209,7 @@ Avoid one document for every sprint. Ask for the names and current facts needed 
 
 ### 2. Find supporting evidence
 
-Use semantic search, get, and list tools. If search later advertises optional lineage context and chronology helps, it may provide additional wayfinding; lineage availability is never required for this document.
+Use semantic search, get, and list tools. This document requires only those tools; lineage availability is never required for it.
 
 Find evidence for the user's facts. Compare dates, identify gaps, and show genuine conflicts instead of resolving them by guesswork.
 

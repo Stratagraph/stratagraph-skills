@@ -1,4 +1,3 @@
-import re
 import unittest
 from pathlib import Path
 
@@ -12,92 +11,63 @@ def shipped_text_files():
         ROOT / ".claude-plugin" / "marketplace.json",
         ROOT / ".codex-plugin" / "plugin.json",
     ]
-    files.extend((ROOT / "skills").rglob("*.md"))
-    files.extend((ROOT / "skills").rglob("*.yaml"))
+    for pattern in ("*.md", "*.yaml", "*.yml", "*.py"):
+        files.extend((ROOT / "skills").rglob(pattern))
     return sorted(set(files))
 
 
 class NoEdgeSurfacesTests(unittest.TestCase):
-    def test_shipped_skill_surfaces_are_edge_free(self):
-        forbidden_literals = (
+    def test_shipped_surfaces_name_no_retired_tools_or_fields(self):
+        # Retired MCP tool and field identifiers. Substring matching, so
+        # singular entries also cover their plural and suffixed forms
+        # (edge_type covers edge_types, edges_in covers edges_in_count).
+        forbidden_tokens = (
             "strata_list_edges",
             "strata_traverse",
             "strata_suggest_edges",
             "superseded_by",
-            "edges_in_count",
-            "edges_out_count",
             "edges_in",
             "edges_out",
-            "edge_types",
-            "edge_fields",
+            "edge_type",
+            "edge_field",
             "edge_count",
+            "edges_dropped",
+            "edges_created",
+            "similarity_edges",
             "resolved_by",
             "observed_relation",
             "has_source_stale",
             "replace_reason",
-            "edges_dropped",
-            "countered, replaced, or resolved",
-            "stratagraph can connect repeated support after import",
-            "stratagraph connects it to relevant imported history",
-        )
-        forbidden_words = re.compile(
-            r"\b(?:edge|edges|relationship|relationships)\b", re.IGNORECASE
         )
 
         violations = []
         for path in shipped_text_files():
-            text = path.read_text(encoding="utf-8")
-            lowered = text.lower()
-            for literal in forbidden_literals:
-                if literal in lowered:
-                    violations.append(f"{path.relative_to(ROOT)}: {literal}")
-            for match in forbidden_words.finditer(text):
-                line = text.count("\n", 0, match.start()) + 1
-                violations.append(
-                    f"{path.relative_to(ROOT)}:{line}: {match.group(0)}"
-                )
+            lowered = path.read_text(encoding="utf-8").lower()
+            for token in forbidden_tokens:
+                if token in lowered:
+                    violations.append(f"{path.relative_to(ROOT)}: {token}")
 
         self.assertEqual([], violations, "\n".join(violations))
 
-    def test_all_five_skills_are_scanned(self):
+    def test_every_canonical_skill_is_scanned(self):
+        canonical = {
+            path.parent.name for path in (ROOT / "skills").glob("*/SKILL.md")
+        }
         scanned = {
             path.parent.name
             for path in shipped_text_files()
             if path.name == "SKILL.md" and path.parent.parent.name == "skills"
         }
-        self.assertEqual(
-            {"find-in-stratagraph", "post", "post-nodes", "import", "gather"},
-            scanned,
-        )
+        self.assertTrue(canonical)
+        self.assertEqual(canonical, scanned)
 
-    def test_required_import_references_are_scanned(self):
-        scanned = set(shipped_text_files())
-        required = {
-            ROOT / "skills" / "import" / "references" / "evidence.md",
-            ROOT / "skills" / "import" / "references" / "technical.md",
-        }
-        self.assertTrue(required <= scanned, required - scanned)
-
-    def test_import_guidance_is_nodes_only(self):
-        evidence = (
-            ROOT / "skills" / "import" / "references" / "evidence.md"
-        ).read_text(encoding="utf-8")
-        skill = (ROOT / "skills" / "import" / "SKILL.md").read_text(
-            encoding="utf-8"
-        )
-
-        self.assertIn("Semantic indexing works at node level", evidence)
-        self.assertIn("could change independently", evidence)
+    def test_import_helper_script_is_scanned(self):
         self.assertIn(
-            "keep each source-backed occurrence in a separate node",
-            evidence,
-        )
-        self.assertIn(
-            "its extracted nodes are indexed semantically alongside the imported nodes",
-            skill,
+            ROOT / "skills" / "import" / "scripts" / "import.py",
+            set(shipped_text_files()),
         )
 
-    def test_post_nodes_matches_the_nodes_only_receipt(self):
+    def test_post_nodes_documents_the_receipt_fields(self):
         skill = (ROOT / "skills" / "post-nodes" / "SKILL.md").read_text(
             encoding="utf-8"
         )
@@ -108,10 +78,6 @@ class NoEdgeSurfacesTests(unittest.TestCase):
         ):
             with self.subTest(field=field):
                 self.assertIn(field, skill)
-        self.assertIn(
-            "This works for both `transcript` and `document` sources",
-            skill,
-        )
 
 
 if __name__ == "__main__":

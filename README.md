@@ -1,6 +1,6 @@
 # stratagraph-skills
 
-Project-agnostic agent skills for using a [Stratagraph](https://stratagraph.io) knowledge graph. The skills find verified answers, post new source material, cold-start a project from an existing corpus, and keep it fed as an unattended cloud routine.
+Project-agnostic agent skills for using a [Stratagraph](https://stratagraph.io) knowledge graph. The skills find grounded answers, post new source material, cold-start a project from an existing corpus, and keep it fed as an unattended cloud routine.
 
 Nothing here is tied to a specific project, team, or connector, so any team can point its agent or routine at this repository with its own connections.
 
@@ -8,7 +8,7 @@ Nothing here is tied to a specific project, team, or connector, so any team can 
 
 ### `find-in-stratagraph`
 
-Answers focused questions from a connected Stratagraph project. Semantic search identifies candidates, and the skill reads the full nodes or documents used as evidence. When chronology would help, a search result may advertise optional full lineage paths for the agent to explore, grouped chronologically by source event. Lineage is provisional wayfinding, never truth, currentness, or completeness. Briefs are optional. The skill never writes to the project, and each material claim cites an exact node key linked to its Stratagraph page. Invoke it with `/stratagraph:find-in-stratagraph`, or ask a focused factual, requirement, status, ownership, source, or chronology question whose answer should come from Stratagraph.
+Answers focused questions from a connected Stratagraph project. Semantic search identifies candidates, and the skill reads the full nodes or documents used as evidence. When chronology would help, a search result may advertise available lineage paths by count; the skill reads the full paths with a separate lineage exploration tool, whose member claims are grouped chronologically by source event. Lineage is provisional wayfinding, never truth, currentness, or completeness. Briefs are optional. The skill never writes to the project, and each material claim cites an exact node key linked to its Stratagraph page. Invoke it with `/stratagraph:find-in-stratagraph`, or ask a focused factual, requirement, status, ownership, source, or chronology question whose answer should come from Stratagraph.
 
 ### `post`
 
@@ -52,7 +52,7 @@ The skills CLI installs the selected canonical folders into the paths used by yo
 
 ### Upgrade an existing install
 
-Copy-based installs and already-running agent tasks do not refresh themselves. After `0.2.4` is released, update the installed skills in the same scope you originally chose:
+Copy-based installs and already-running agent tasks do not refresh themselves. After each release, update the installed skills in the same scope you originally chose:
 
 ```bash
 npx skills update find-in-stratagraph post post-nodes import gather --project --yes
@@ -60,7 +60,7 @@ npx skills update find-in-stratagraph post post-nodes import gather --project --
 npx skills update find-in-stratagraph post post-nodes import gather --global --yes
 ```
 
-Then start a fresh task or reload the agent so it does not retain cached pre-`0.2.4` instructions.
+Then start a fresh task or reload the agent so it does not retain cached instructions from the previous version.
 
 ### Claude Code plugin marketplace
 
@@ -72,7 +72,7 @@ Then start a fresh task or reload the agent so it does not retain cached pre-`0.
 
 Then `/stratagraph:find-in-stratagraph`, `/stratagraph:post`, `/stratagraph:post-nodes`, `/stratagraph:import`, and `/stratagraph:gather` are available. Claude can also invoke them automatically when a request matches. The marketplace manifest points at the same canonical `skills/` folders used by the skills CLI.
 
-To upgrade an existing Claude Code plugin install after `0.2.4` is released, run `/plugin update stratagraph@stratagraph-skills`, then `/reload-plugins`. Start a fresh conversation so earlier skill text is not retained in context.
+To upgrade an existing Claude Code plugin install after a release, run `/plugin update stratagraph@stratagraph-skills`, then `/reload-plugins`. Start a fresh conversation so earlier skill text is not retained in context.
 
 ### MCP connection (all agents)
 

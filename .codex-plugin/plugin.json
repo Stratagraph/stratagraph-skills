@@ -27,7 +27,7 @@
     ],
     "websiteURL": "https://stratagraph.io",
     "defaultPrompt": [
-      "Find a verified answer in my Stratagraph project.",
+      "Find a grounded answer in my Stratagraph project.",
       "Post this source material to Stratagraph.",
       "Import this source collection into a new Stratagraph project."
     ],

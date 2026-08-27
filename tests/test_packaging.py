@@ -102,18 +102,18 @@ class PackagingTests(unittest.TestCase):
         self.assertTrue(adapter.is_symlink())
         self.assertEqual(adapter.resolve(), (SKILLS_DIR / "gather").resolve())
 
-    def test_readme_updates_only_named_stratagraph_skills(self):
+    def test_readme_update_commands_cover_every_canonical_skill(self):
         readme = README_PATH.read_text(encoding="utf-8")
-        named_skills = "find-in-stratagraph post post-nodes import gather"
+        canonical = {Path(path).name for path in canonical_skills()}
 
-        self.assertIn(
-            f"npx skills update {named_skills} --project --yes",
+        commands = re.findall(
+            r"(?m)^npx skills update ((?:[a-z][\w-]* )+)--(project|global) --yes$",
             readme,
         )
-        self.assertIn(
-            f"npx skills update {named_skills} --global --yes",
-            readme,
-        )
+        self.assertEqual({"project", "global"}, {scope for _, scope in commands})
+        for names, scope in commands:
+            with self.subTest(scope=scope):
+                self.assertEqual(canonical, set(names.split()))
         self.assertNotIn("npx skills update --project", readme)
         self.assertNotIn("npx skills update --global", readme)
 

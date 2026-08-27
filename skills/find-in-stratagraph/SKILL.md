@@ -44,14 +44,14 @@ Ask a question only when 2 or more reasonable scopes would produce different ans
 If the environment can spawn subagents and a subagent can reach this project's Stratagraph tools, run the lookup in 1 subagent instead of the main conversation. The full nodes and documents this skill reads are its context-heavy part, and the skill is read-only, so delegation keeps that payload out of the main context at no risk.
 
 - Give the subagent the framed question and this skill to follow.
-- The subagent's report must contain the exact returned node keys and the full node content behind every statement, including `occurred_at`, attribution, review status, and admission method when available. Never accept a paraphrase without keys: the report is the calling agent's only verification evidence, and every node key cited in the final answer comes from it.
+- The subagent's report must contain the exact returned node keys and the full node content behind every statement, including `occurred_at`, attribution, review status, and admission method when available. When the subagent explored lineage, the report must also carry the fence state, the event grouping of the claims it read, and any path or span truncation it saw. Never accept a paraphrase without keys: the report is the calling agent's only verification evidence, and every node key cited in the final answer comes from it.
 - If subagents are unavailable, or they cannot reach the project's tools, follow the rest of this skill directly.
 
 ## Choose the first tool
 
 | Question shape | Start with | What to do |
 |---|---|---|
-| Exact node key | `strata_get_node` | Fetch the known node directly. Do not search for it. |
+| Exact node key | `strata_get_node` | Fetch the known node directly. Do not search for it, except with 1 search on the node's topic when chronology is needed, because only a search response supplies the lineage fence. |
 | Focused topic, fact, status, requirement, owner, chronology, or change | `strata_search_nodes` | Write 1 concise semantic query. Add a type filter only when the request supports it. Chronology still starts with search. |
 | Named document, source, date, or speaker | `strata_list_documents` | Find the relevant documents. Then use `strata_get_document` or search with `document_ids` or `speaker`. |
 | Named brief or explicit request for maintained synthesis | `strata_list_briefs`, then `strata_get_brief` | Use briefs only when they are available and clearly relevant. Continue without them when none exist. |
@@ -70,7 +70,7 @@ After a useful search:
 - Fetch the document when the answer depends on all claims extracted from that document. Then fetch every relevant node in full before citing it.
 - Explore lineage only when the question benefits from chronology and the conditions below are met.
 
-Read full results before running another search. Do not repeat a successful query with synonyms. Search again only to fill a specific gap, such as a named source, person, date, or term found in full node content.
+Read full results before running another search. Do not repeat a successful query with synonyms. Search again only to fill a specific gap, such as a named source, person, date, or term found in full node content. Stop when the evidence answers the question.
 
 ### Explore chronology conditionally
 
@@ -120,4 +120,4 @@ Include only what helps the user judge the answer:
 - any relevant review note
 - any evidence gap
 
-Never display a bare node key in the user-facing answer. Never invent or reconstruct a node key. Do not describe the tool calls unless the user asks. After semantic search, say, “I didn't find this in the returned matches.” Claim only that a specific document lacks an extracted claim after retrieving the document and confirming that `truncated` is `false`.
+Never display a bare node key in the user-facing answer. Never invent or reconstruct a node key. Do not describe the tool calls unless the user asks. When the answer is not in the returned matches, say, “I didn't find this in the returned matches.” Claim only that a specific document lacks an extracted claim after retrieving the document and confirming that `truncated` is `false`.
