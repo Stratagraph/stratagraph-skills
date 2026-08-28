@@ -7,8 +7,8 @@ description: Cold-start a new or empty Stratagraph graph from existing sources a
 
 An import has 2 parts:
 
-1. Extract small, source-backed claims from the project's history. Stratagraph stores them without graph connections.
-2. Create a reviewed current-state document. Stratagraph uses it to connect the history that still matters.
+1. Extract small, source-backed claims from the project's history.
+2. Create a reviewed current-state document that records what still matters now.
 
 The work may span several sessions. Use the reports, entry files, bundle, and worklist to resume safely.
 
@@ -31,7 +31,7 @@ Cover these stages in plain language:
 2. **Check the size.** Inventory the approved locations and estimate the work.
 3. **Extract and verify.** Keep each claim small and link it to exact source text.
 4. **Review and import.** Give the user an import review report and import file. Nothing reaches Stratagraph before approval.
-5. **Connect current knowledge.** Help the user write a short current-state document after import.
+5. **Record current knowledge.** Help the user write a short current-state document after import.
 
 Explain which decisions are needed now and which can wait:
 
@@ -188,13 +188,13 @@ Keep separate review bundles for source groups with different origins or evidenc
 
 Ask the user to review the import review report. Do not upload before approval.
 
-After approval, the user can drop `import-bundle.json` on the Stratagraph Import page. The page publishes documents from oldest to newest. Imported claims still have no graph edges.
+After approval, the user can drop `import-bundle.json` on the Stratagraph Import page. The page publishes documents from oldest to newest.
 
 Embedding time varies. About 1 minute for every 300 claims is only a rough estimate. A successful `strata_search_nodes` query for a known topic is the readiness check.
 
 ## Part 2: create the current-state document
 
-Imported claims have no graph edges. The user must choose the structure and provide the current facts.
+Imported claims become available to semantic search after indexing. The user must choose the current-state structure and provide the current facts.
 
 ### 1. Choose a structure
 
@@ -209,7 +209,7 @@ Avoid one document for every sprint. Ask for the names and current facts needed 
 
 ### 2. Find supporting evidence
 
-Use search, get, and list tools. Do not use `strata_traverse` before the graph has edges.
+Use semantic search, get, and list tools. This document requires only those tools; lineage availability is never required for it.
 
 Find evidence for the user's facts. Compare dates, identify gaps, and show genuine conflicts instead of resolving them by guesswork.
 
@@ -219,7 +219,7 @@ Write focused prose that covers what is in force, what changed, and what remains
 
 Show each draft to the user and ask for corrections. After approval, post it with `strata_post_document`. Use `_import/baseline-<slug>.md` as its `externalId`.
 
-The document must pass the normal Stratagraph review gate. After approval there, Stratagraph connects it to relevant imported history.
+The document must pass the normal Stratagraph review gate. After approval there, its extracted nodes are indexed semantically alongside the imported nodes.
 
 If search or retrieval tools are unavailable, stop and offer setup help. Do not describe an ungrounded draft as evidence-backed. If the user chooses a manual path, use only facts they explicitly provide and ask them to verify every claim before upload.
 
@@ -236,4 +236,4 @@ If search or retrieval tools are unavailable, stop and offer setup help. Do not 
 - A reviewed change was not validated and replaced in the bundle.
 - A current-state claim has no retrieved evidence.
 - The current-state structure was inferred instead of agreed with the user.
-- `strata_traverse` is being used before the graph has edges.
+- Lineage availability is being treated as a prerequisite for current-state work.

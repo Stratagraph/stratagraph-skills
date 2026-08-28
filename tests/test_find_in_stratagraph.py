@@ -7,57 +7,78 @@ SKILL_PATH = ROOT / "skills" / "find-in-stratagraph" / "SKILL.md"
 
 
 class FindInStratagraphTests(unittest.TestCase):
+    """Pin the MCP contract tokens the skill teaches: tool names, field
+    names, and gating conditions. Prose wording is free to change."""
+
     @classmethod
     def setUpClass(cls):
         cls.skill = SKILL_PATH.read_text(encoding="utf-8")
         cls.lower = cls.skill.lower()
 
-    def test_search_results_are_candidates_not_authority(self):
-        self.assertIn("semantic_similarity", self.skill)
-        self.assertIn(
-            "treat `semantic_similarity` when supplied as relative proximity, not truth, confidence, relevance, or currentness.",
-            self.lower,
-        )
-        self.assertIn(
-            "a node's existence in the graph does not establish that it is relevant, true, or current.",
-            self.lower,
-        )
-        self.assertIn(
-            "describe conclusions as graph grounding — what the project records and currently treats as canonical — rather than externally verified truth unless separate evidence verifies them.",
-            self.lower,
-        )
+    def test_read_tools_are_documented(self):
+        for tool in (
+            "`strata_search_nodes`",
+            "`strata_get_node`",
+            "`strata_get_nodes`",
+            "`strata_get_document`",
+            "`strata_list_documents`",
+            "`strata_list_briefs`",
+            "`strata_get_brief`",
+            "`strata_get_graph_schema`",
+            "`strata_explore_lineage`",
+        ):
+            with self.subTest(tool=tool):
+                self.assertIn(tool, self.skill)
 
-    def test_current_state_checks_each_dimension(self):
-        for field in ("occurred_at", "occurred_at_basis", "review"):
+    def test_lineage_gate_conditions(self):
+        for condition in (
+            "`strata_explore_lineage` is attached",
+            "`lineage.state: available`",
+            "`lineage.as_of_fence`",
+            "`lineage_context.path_count` is greater than zero",
+        ):
+            with self.subTest(condition=condition):
+                self.assertIn(condition, self.lower)
+
+    def test_lineage_response_fields(self):
+        for field in (
+            "`paths`",
+            "`page`",
+            "`origin_context`",
+            "`span.complete: false`",
+            "`path_count_basis` is `lower_bound`",
+            "`paths_truncated`",
+            "`continues_before`",
+            "`continues_after`",
+            "`continuation.members_truncated`",
+            "`expired`",
+            "cursor",
+        ):
             with self.subTest(field=field):
-                self.assertIn(f"`{field}`", self.skill)
-        self.assertIn(
-            "incoming `replaces` and `resolves` relationships, and `counters` relationships in both directions.",
-            self.lower,
-        )
-        self.assertIn(
-            "an inbound `replaces` edge retires a claim; counters and age alone do not.",
-            self.lower,
-        )
+                self.assertIn(field, self.lower)
 
-    def test_replacement_chain_is_bounded_and_cycle_safe(self):
+    def test_evidence_fields(self):
+        for field in (
+            "`semantic_similarity`",
+            "`occurred_at`",
+            "`occurred_at_basis`",
+            "`review`",
+            "`admission_method`",
+            "`truncated: true`",
+            "`document_date`",
+            "`record_created`",
+            "`speaker`",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, self.skill)
+
+    def test_admission_contract_values(self):
         self.assertIn(
-            "start with `superseded_by` when search supplies it, then use `strata_list_edges` for each next inbound `replaces` hop.",
+            "`admission_method` is `import` and `review` is `unreviewed`",
             self.lower,
         )
-        self.assertIn("track every visited node key.", self.lower)
-        self.assertIn(
-            "stop if a key repeats; report a replacement cycle and that no live head was found.",
-            self.lower,
-        )
-        self.assertIn(
-            "stop after 20 hops; report the unresolved cap rather than guessing.",
-            self.lower,
-        )
-        self.assertIn(
-            "if the walk ends at a node with no inbound `replaces`, cite that terminal successor",
-            self.lower,
-        )
+        self.assertIn("`admission_method` is absent", self.lower)
+        self.assertIn("`imported`", self.lower)
 
 
 if __name__ == "__main__":

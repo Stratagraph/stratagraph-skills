@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 MARKETPLACE_PATH = ROOT / ".claude-plugin" / "marketplace.json"
 CODEX_MANIFEST_PATH = ROOT / ".codex-plugin" / "plugin.json"
+README_PATH = ROOT / "README.md"
 
 
 def canonical_skills():
@@ -100,6 +101,21 @@ class PackagingTests(unittest.TestCase):
         adapter = ROOT / ".claude" / "skills" / "gather"
         self.assertTrue(adapter.is_symlink())
         self.assertEqual(adapter.resolve(), (SKILLS_DIR / "gather").resolve())
+
+    def test_readme_update_commands_cover_every_canonical_skill(self):
+        readme = README_PATH.read_text(encoding="utf-8")
+        canonical = {Path(path).name for path in canonical_skills()}
+
+        commands = re.findall(
+            r"(?m)^npx skills update ((?:[a-z][\w-]* )+)--(project|global) --yes$",
+            readme,
+        )
+        self.assertEqual({"project", "global"}, {scope for _, scope in commands})
+        for names, scope in commands:
+            with self.subTest(scope=scope):
+                self.assertEqual(canonical, set(names.split()))
+        self.assertNotIn("npx skills update --project", readme)
+        self.assertNotIn("npx skills update --global", readme)
 
 
 if __name__ == "__main__":

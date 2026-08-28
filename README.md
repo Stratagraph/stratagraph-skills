@@ -1,6 +1,6 @@
 # stratagraph-skills
 
-Project-agnostic agent skills for using a [Stratagraph](https://stratagraph.io) knowledge graph. The skills find verified answers, post new source material, cold-start a project from an existing corpus, and keep it fed as an unattended cloud routine.
+Project-agnostic agent skills for using a [Stratagraph](https://stratagraph.io) knowledge graph. The skills find grounded answers, post new source material, cold-start a project from an existing corpus, and keep it fed as an unattended cloud routine.
 
 Nothing here is tied to a specific project, team, or connector, so any team can point its agent or routine at this repository with its own connections.
 
@@ -8,7 +8,7 @@ Nothing here is tied to a specific project, team, or connector, so any team can 
 
 ### `find-in-stratagraph`
 
-Answers focused questions from a connected Stratagraph project. It chooses the right read tool for a node key, topic, document, speaker, or relationship. Search results identify candidates. The skill reads full nodes and checks relationships before claiming that something is current, replaced, disputed, or resolved. Briefs are optional. The skill never writes to the project, and each material claim cites an exact node key linked to its Stratagraph page. Invoke it with `/stratagraph:find-in-stratagraph`, or ask a focused factual, requirement, status, ownership, or source question whose answer should come from Stratagraph. Use a separate trace workflow for broad topic histories.
+Answers focused questions from a connected Stratagraph project. Semantic search identifies candidates, and the skill reads the full nodes or documents used as evidence. When chronology would help, a search result may advertise available lineage paths by count; the skill reads the full paths with a separate lineage exploration tool, whose member claims are grouped chronologically by source event. Lineage is provisional wayfinding, never truth, currentness, or completeness. Briefs are optional. The skill never writes to the project, and each material claim cites an exact node key linked to its Stratagraph page. Invoke it with `/stratagraph:find-in-stratagraph`, or ask a focused factual, requirement, status, ownership, source, or chronology question whose answer should come from Stratagraph.
 
 ### `post`
 
@@ -16,11 +16,11 @@ Turns material the agent can read into an extraction-ready Markdown document and
 
 ### `post-nodes`
 
-Posts a source document to a connected Stratagraph project together with claims and relationships already classified from it, using `strata_post_nodes`. The document anchors the post; its claims land as candidate nodes in the human review gate, never directly in the graph. Use it when a source's claims are already typed, with or without edges between them, and should attach to an active project in one call instead of waiting on automatic extraction. The skill never invents a node key: it only cites keys returned by a search, get, or list tool this session, or given by the user, and it omits an edge rather than guess an endpoint. It reads accepted node types from the live schema rather than a memorized list, and requires every quote span to be an exact substring of the posted document. `counters` and `replaces` edges always land as pending conflicts for a human to adjudicate. Invoke it with `/stratagraph:post-nodes`, or ask to post a document together with its already-extracted claims or relationships.
+Posts a source document to a connected Stratagraph project together with claims already classified from it, using `strata_post_nodes`. The document anchors the post; its claims land as candidate nodes in the human review gate, never directly in the graph. Use it when a source's claims are already typed and should attach to an active project in one call instead of waiting on automatic extraction. It reads accepted node types from the live schema rather than a memorized list, and requires every quote span to be an exact substring of the posted document. Invoke it with `/stratagraph:post-nodes`, or ask to post a document together with its already-extracted claims.
 
 ### `import`
 
-Cold-starts a new or empty Stratagraph graph from existing sources. The agent first explains the process and agrees the scope with you. It then inventories the approved sources, extracts small claims with exact source text, and prepares an import review report and `import-bundle.json` file. After you import and review that history, the agent helps write a current-state document that connects what still matters. `scripts/import.py` handles inventory, strict source validation, reviewed-entry replacement, import file assembly, and deterministic combination of separately reviewed import files. Invoke the skill with `/stratagraph:import`, or point it at a source collection and ask to cold-start a Stratagraph project. Do not use it for routine ingestion or posting one document.
+Cold-starts a new or empty Stratagraph graph from existing sources. The agent first explains the process and agrees the scope with you. It then inventories the approved sources, extracts small claims with exact source text, and prepares an import review report and `import-bundle.json` file. After you import and review that history, the agent helps write a current-state document that records what still matters. `scripts/import.py` handles inventory, strict source validation, reviewed-entry replacement, import file assembly, and deterministic combination of separately reviewed import files. Invoke it with `/stratagraph:import`, or point it at a source collection and ask to cold-start a Stratagraph project. Do not use it for routine ingestion or posting one document.
 
 ### `gather`
 
@@ -50,6 +50,18 @@ npx skills add Stratagraph/stratagraph-skills --skill gather
 
 The skills CLI installs the selected canonical folders into the paths used by your agent. It uses project scope by default. Choose its global option when you want the skills available across projects.
 
+### Upgrade an existing install
+
+Copy-based installs and already-running agent tasks do not refresh themselves. After each release, update the installed skills in the same scope you originally chose:
+
+```bash
+npx skills update find-in-stratagraph post post-nodes import gather --project --yes
+# or, for a global install
+npx skills update find-in-stratagraph post post-nodes import gather --global --yes
+```
+
+Then start a fresh task or reload the agent so it does not retain cached instructions from the previous version.
+
 ### Claude Code plugin marketplace
 
 ```text
@@ -59,6 +71,8 @@ The skills CLI installs the selected canonical folders into the paths used by yo
 ```
 
 Then `/stratagraph:find-in-stratagraph`, `/stratagraph:post`, `/stratagraph:post-nodes`, `/stratagraph:import`, and `/stratagraph:gather` are available. Claude can also invoke them automatically when a request matches. The marketplace manifest points at the same canonical `skills/` folders used by the skills CLI.
+
+To upgrade an existing Claude Code plugin install after a release, run `/plugin update stratagraph@stratagraph-skills`, then `/reload-plugins`. Start a fresh conversation so earlier skill text is not retained in context.
 
 ### MCP connection (all agents)
 
